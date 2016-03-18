@@ -53,7 +53,7 @@ public class MainActivity extends AppCompatActivity implements SensorEventListen
                     if (gps.canGetLocation) {
                         double latitude = gps.getLatitude();
                         double longitude = gps.getLongitude();
-                        float bearing = gps.getBearing() == 0.0 ? Float.parseFloat(bearingText.getText().toString()) : gps.getBearing();
+                        float bearing = Float.parseFloat(bearingText.getText().toString());
                         gpsController.sendCoordinates(longitude, latitude, bearing, Double.parseDouble(lenght.getText().toString()));
                         Toast.makeText(getApplicationContext(), "Your Location is - \nLat: " + latitude + "\nLong: " + longitude + "\nBearing: " + bearing, Toast.LENGTH_LONG).show();
                     } else {
