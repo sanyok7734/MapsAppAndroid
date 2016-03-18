@@ -1,20 +1,13 @@
 package com.odintsov.mapsapp;
 
-import android.Manifest;
-import android.content.Context;
 import android.content.Intent;
-import android.content.pm.PackageManager;
 import android.hardware.Sensor;
 import android.hardware.SensorEvent;
 import android.hardware.SensorEventListener;
 import android.hardware.SensorManager;
-import android.location.Criteria;
-import android.location.Location;
-import android.location.LocationManager;
-import android.provider.Settings;
-import android.support.v4.app.ActivityCompat;
-import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
+import android.provider.Settings;
+import android.support.v7.app.AppCompatActivity;
 import android.view.View;
 import android.view.animation.Animation;
 import android.view.animation.RotateAnimation;
@@ -23,6 +16,8 @@ import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
+
+import com.odintsov.mapsapp.network.GpsController;
 
 public class MainActivity extends AppCompatActivity implements SensorEventListener {
 
@@ -34,6 +29,7 @@ public class MainActivity extends AppCompatActivity implements SensorEventListen
 
     private SensorManager mSensorManager;
     private float currentDegree = 0f;
+    private GpsController gpsController;
 
 
     @Override
@@ -47,7 +43,7 @@ public class MainActivity extends AppCompatActivity implements SensorEventListen
         bearingText = (TextView) findViewById(R.id.bearingText);
 
         mSensorManager = (SensorManager) getSystemService(SENSOR_SERVICE);
-
+        gpsController = new GpsController(MainActivity.this);
 
         coordinate.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -57,7 +53,8 @@ public class MainActivity extends AppCompatActivity implements SensorEventListen
                     if (gps.canGetLocation) {
                         double latitude = gps.getLatitude();
                         double longitude = gps.getLongitude();
-                        float bearing = gps.getBearing();
+                        float bearing = gps.getBearing() == 0.0 ? Float.parseFloat(bearingText.getText().toString()) : gps.getBearing();
+                        gpsController.sendCoordinates(longitude, latitude, bearing, Double.parseDouble(lenght.getText().toString()));
                         Toast.makeText(getApplicationContext(), "Your Location is - \nLat: " + latitude + "\nLong: " + longitude + "\nBearing: " + bearing, Toast.LENGTH_LONG).show();
                     } else {
                         gps.showSettingsAlert();
@@ -66,7 +63,6 @@ public class MainActivity extends AppCompatActivity implements SensorEventListen
             }
         });
     }
-
 
 
     //проверяем доступность gps
